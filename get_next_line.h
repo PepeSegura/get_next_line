@@ -6,7 +6,7 @@
 /*   By: psegura- <psegura-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 22:16:35 by psegura-          #+#    #+#             */
-/*   Updated: 2022/08/21 05:17:26 by psegura-         ###   ########.fr       */
+/*   Updated: 2022/08/21 06:04:03 by psegura-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,9 @@
 char	*get_next_line(int fd);
 
 //MAIN
-size_t	ft_strlen(char *str);
-int		ft_newline_in_stash(char *buffer);
+size_t	ft_len_or_nlpos(char *str, char a);
+//size_t	ft_strlen(char *str);
+//int		ft_newline_in_stash(char *buffer);
 char	*ft_read_and_buffer(int fd);
 char	*ft_buffer_to_stash(char *stash, char *buffer);
 char	*ft_stash_to_line(char *stash, size_t newline_pos);
