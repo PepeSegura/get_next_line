@@ -6,37 +6,57 @@
 /*   By: psegura- <psegura-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/20 23:56:04 by psegura-          #+#    #+#             */
-/*   Updated: 2022/08/21 05:29:44 by psegura-         ###   ########.fr       */
+/*   Updated: 2022/08/21 05:58:03 by psegura-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(char *str)
+size_t	ft_len_or_nlpos(char *str, char a)
 {
 	int	i;
 
 	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-int	ft_newline_in_stash(char *buffer)
-{
-	int	i;
-
-	i = 0;
-	while (buffer[i])
+	if (a == '\0')
 	{
-		if (buffer[i] == '\n')
-		{
+		while (str[i])
+			i++;
+		return (i);
+	}
+	while (str[i])
+	{
+		if (str[i] == a)
 			return (i);
-		}
 		i++;
 	}
 	return (FALSE);
 }
+
+// size_t	ft_strlen(char *str)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	while (str[i])
+// 		i++;
+// 	return (i);
+// }
+
+// int	ft_newline_in_stash(char *buffer)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	while (buffer[i])
+// 	{
+// 		if (buffer[i] == '\n')
+// 		{
+// 			return (i);
+// 		}
+// 		i++;
+// 	}
+// 	return (FALSE);
+// }
 
 char	*ft_read_and_buffer(int fd)
 {
@@ -58,7 +78,7 @@ char	*ft_buffer_to_stash(char *stash, char *buffer)
 
 	if (stash == NULL)
 		return (NULL);
-	stash_len = ft_strlen(stash);
+	stash_len = ft_len_or_nlpos(stash, '\0');
 	l_total = stash_len + BUFFER_SIZE;
 	final = malloc(sizeof(char) * l_total + 1);
 	if (final == NULL)
@@ -108,8 +128,8 @@ int	main(void)
 	printf("Buffer Size -> [%d]\n", BUFFER_SIZE);
 
 	//OPEN FILE AND GET FD
-	fd = open("./tests/1l_numbers.txt", O_RDWR);
-	// fd = open("./tests/long_line.txt", O_RDWR);
+	// fd = open("./tests/1l_numbers.txt", O_RDWR);
+	fd = open("./tests/long_line.txt", O_RDWR);
 	// fd = open("./tests/long_line_no_nl.txt", O_RDWR);
 	printf("fd -> [%d]\n", fd);
 
@@ -122,7 +142,7 @@ int	main(void)
 	printf("Stash -> [%s]\n", stash);
 
 	//NEW LINE in STASH?
-	newline_in_stash = ft_newline_in_stash(stash);
+	newline_in_stash = ft_len_or_nlpos(stash, '\n');
 	printf("Line in Stash -> [%d]\n", newline_in_stash);
 
 	//LINE
@@ -137,7 +157,7 @@ int	main(void)
 		{
 			buffer = ft_read_and_buffer(fd);
 			stash = ft_buffer_to_stash(stash, buffer);
-			newline_in_stash = ft_newline_in_stash(stash);
+			newline_in_stash = ft_len_or_nlpos(stash, '\n');
 			if (newline_in_stash != 0)
 			{	
 				line = ft_stash_to_line(stash, newline_in_stash);
