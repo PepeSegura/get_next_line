@@ -5,102 +5,100 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: psegura- <psegura-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/21 07:12:46 by psegura-          #+#    #+#             */
-/*   Updated: 2022/08/21 07:14:36 by psegura-         ###   ########.fr       */
+/*   Created: 2022/09/07 18:54:26 by psegura-          #+#    #+#             */
+/*   Updated: 2022/09/09 00:00:07 by psegura-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_read_and_buffer(int fd)
+char	*ft_get_stash(int fd, char *stash)
 {
 	char	*buffer;
+	int		readed;
 
-	buffer = malloc(sizeof(char) * BUFFER_SIZE);
-	if (buffer == NULL)
-		return (0);
-	read(fd, buffer, BUFFER_SIZE);
-	return (buffer);
+	if (!stash)
+		stash = ft_calloc(sizeof(char), 1);
+	buffer = ft_calloc(sizeof(char), (BUFFER_SIZE + 1));
+	if (!buffer)
+		return (NULL);
+	readed = 1;
+	while (!ft_strchr(buffer, '\n') && readed != 0)
+	{
+		readed = read(fd, buffer, BUFFER_SIZE);
+		if (readed == -1)
+		{
+			free(buffer);
+			free(stash);
+			return (NULL);
+		}
+		buffer[readed] = '\0';
+		stash = ft_strjoin(stash, buffer);
+	}
+	free(buffer);
+	return (stash);
 }
 
-char	*ft_buffer_to_stash(char *stash, char *buffer)
+char	*ft_get_line(char *stash)
 {
-	char	*final;
-	size_t	stash_len;
-	size_t	l_total;
-	size_t	i;
-
-	if (stash == NULL)
-		return (NULL);
-	stash_len = ft_len_or_nlpos(stash, '\0');
-	l_total = stash_len + BUFFER_SIZE;
-	final = malloc(sizeof(char) * l_total + 1);
-	if (final == NULL)
-		return (NULL);
-	i = 0;
-	while (i < stash_len)
-	{
-		final[i] = stash[i];
-		i++;
-	}
-	while (i < l_total)
-	{
-		final[i] = buffer[i - stash_len];
-		i++;
-	}
-	final[i] = '\0';
-	return (final);
-}
-
-char	*ft_stash_to_line(char *stash, size_t newline_pos)
-{
-	size_t	i;
 	char	*line;
+	int		i;
 
 	i = 0;
-	line = malloc(sizeof(char) * newline_pos + 1);
-	if (line == NULL)
+	if (!stash[i])
 		return (NULL);
-	while (i <= newline_pos)
+	while (stash[i] != '\0' && stash[i] != '\n')
+		i++;
+	line = ft_calloc(sizeof(char), (i + 2));
+	if (!line)
+		return (NULL);
+	i = 0;
+	while (stash[i] != '\0' && stash[i] != '\n')
 	{
 		line[i] = stash[i];
 		i++;
 	}
-	line[i] = '\0';
+	if (stash[i] == '\n' && stash[i])
+		line[i] = stash[i];
 	return (line);
 }
 
-void	ft_write(int newline_in_stash, char *buffer, int fd, char *stash)
+char	*ft_clean_stash(char *stash)
 {
-	if (newline_in_stash != 0)
-	{	
-		var.line = ft_stash_to_line(stash, newline_in_stash);
-		printf("Line -> [%s]\n", var.line);
-	}
-	else
+	char	*temp;
+	int		i;
+	int		j;
+
+	i = 0;
+	while (stash[i] != '\n' && stash[i] != '\0')
+		i++;
+	if (!stash[i])
 	{
-		while (newline_in_stash == 0)
-		{
-			buffer = ft_read_and_buffer(fd);
-			stash = ft_buffer_to_stash(stash, buffer);
-			newline_in_stash = ft_len_or_nlpos(stash, '\n');
-			if (newline_in_stash != 0)
-				var.line = ft_stash_to_line(stash, newline_in_stash);
-		}
+		free(stash);
+		return (NULL);
 	}
+	temp = ft_calloc(sizeof(char), (ft_strlen(stash) - i + 1));
+	if (!temp)
+		return (NULL);
+	i++;
+	j = 0;
+	while (stash[i])
+		temp[j++] = stash[i++];
+	free(stash);
+	return (temp);
 }
 
 char	*get_next_line(int fd)
 {
 	static char	*stash;
+	char		*line;
 
-	stash = "";
-	var.buffer = ft_read_and_buffer(fd);
-	printf("Buffer -> [%s]\n", var.buffer);
-	stash = ft_buffer_to_stash(stash, var.buffer);
-	printf("Stash -> [%s]\n", stash);
-	var.newline_in_stash = ft_len_or_nlpos(stash, '\n');
-	printf("Line in Stash -> [%d]\n", var.newline_in_stash);
-	ft_write(var.newline_in_stash, var.buffer, fd, stash);
-	return (var.line);
+	if (BUFFER_SIZE <= 0 || fd < 0)
+		return (NULL);
+	stash = ft_get_stash(fd, stash);
+	if (!stash)
+		return (NULL);
+	line = ft_get_line(stash);
+	stash = ft_clean_stash(stash);
+	return (line);
 }

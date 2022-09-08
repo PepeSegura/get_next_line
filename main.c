@@ -5,39 +5,36 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: psegura- <psegura-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/21 07:14:22 by psegura-          #+#    #+#             */
-/*   Updated: 2022/08/21 07:16:36 by psegura-         ###   ########.fr       */
+/*   Created: 2022/09/08 01:34:27 by psegura-          #+#    #+#             */
+/*   Updated: 2022/09/08 23:32:11 by psegura-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
+void	ft_leaks(void)
+{
+	system("leaks a.out");
+}
+
 int	main(void)
 {
-	int	fd[2];
+	int		fd;
+	char	*line;
+	int 	lineas = 2;
 
-	printf("Buffer Size -> [%d]\n\n", BUFFER_SIZE);
-	
-	fd[0] = open("./tests/letters.txt", O_RDWR);
-	fd[1] = open("./tests/numbers.txt", O_RDWR);
-	
-	printf("fd -> [%d]\n", fd[0]);
-	get_next_line(3);
-	printf("Line -> [%s]\n", var.line);
-	
-	printf("fd -> [%d]\n", fd[1]);
-	get_next_line(4);
-	printf("Line -> [%s]\n", var.line);
-
-	printf("fd -> [%d]\n", fd[0]);
-	get_next_line(3);
-	printf("Line -> [%s]\n", var.line);
-	
-	printf("fd -> [%d]\n", fd[1]);
-	get_next_line(4);
-	printf("Line -> [%s]\n\n\n\n", var.line);
-
-	get_next_line(1);
-	printf("STDIO -> [%s]\n", var.line);
+	// atexit(ft_leaks);
+	fd = open("./gnlTester/files/41_with_nl", O_RDONLY);
+	// fd = open("./gnl_lotr.txt", O_RDONLY);
+	// fd = open("./get_next_line.c", O_RDONLY);
+	while (lineas > 0)
+	{
+		line = get_next_line(fd);
+		
+		printf("%s", line);
+		free(line);
+		lineas--;
+	}
+	close(fd);
 	return (0);
 }
