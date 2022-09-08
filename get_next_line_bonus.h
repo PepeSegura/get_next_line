@@ -13,11 +13,10 @@
 #ifndef GET_NEXT_LINE_BONUS_H
 # define GET_NEXT_LINE_BONUS_H
 
+//Includes
 # include <unistd.h>
 # include <stdio.h>
 # include <stdlib.h>
-//Open
-# include <fcntl.h>
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 10
